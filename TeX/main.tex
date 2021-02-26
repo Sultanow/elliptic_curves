@@ -1,0 +1,144 @@
+\documentclass[12pt]{amsart}
+\usepackage{enumerate}
+\usepackage[colorlinks=true, linkcolor=blue, urlcolor=blue, citecolor=blue, anchorcolor=blue, pdfborder={0 0 0}]{hyperref}
+\usepackage{url}
+\usepackage{graphicx,color}
+\usepackage{cite}
+\usepackage{amsthm, amsmath, amssymb}
+\usepackage{mathtools}
+\usepackage[top=45truemm, bottom=45truemm, left=30truemm, right=30truemm]{geometry}
+\usepackage{nicefrac}
+\usepackage{cancel}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{makecell}
+\usepackage{array}
+\usepackage{ragged2e}
+
+\newcolumntype{P}[1]{>{\RaggedRight\hspace{0pt}}p{#1}}
+
+\newcolumntype{L}{>{\begin{math}}l<{\end{math}}}%
+\newcolumntype{C}{>{\begin{math}}c<{\end{math}}}%
+\newcolumntype{R}{>{\begin{math}}r<{\end{math}}}%
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{example}{Example}
+\theoremstyle{definition}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\len}{len}
+
+\setlength{\headsep}{2em}
+\setlength{\skip\footins}{1.4pc plus 5pt minus 2pt}
+
+\title[Rational Points in Elliptic Curves]{Rational Points in Elliptic Curves \boldmath$y^2=x^3+pqx$}
+
+\author[E.\ Sultanow]{\href{https://orcid.org/0000-0001-5257-2236}{\includegraphics[scale=0.06]{orcid.png}}\hspace{1mm}Eldar Sultanow}
+\address{Eldar Sultanow\\
+	Capgemini\\ Bahnhofstraße 30 \\ 90402 Nuremberg\\ Germany}
+\curraddr{}
+\email{eldar.sultanow@capgemini.com}
+
+\author[J.\ Jormakka]{Jorma Jormakka}
+\address{Sourangshu Ghosh\\Indian institute of Technology Kharagpur\\Kharagpur, West Bengal 721302\\India}
+\curraddr{}
+\email{sourangshu@iitkgp.ac.in}
+
+\author[S.\ Ghosh]{Sourangshu Ghosh}
+\address{Sourangshu Ghosh\\Indian institute of Technology Kharagpur\\Kharagpur, West Bengal 721302\\India}
+\curraddr{}
+\email{sourangshu@iitkgp.ac.in}
+
+\subjclass[2010]{14H52}
+\keywords{Elliptic Curves, Rational Points}
+
+\begin{document}
+	
+\begingroup
+\let\MakeUppercase\relax
+\maketitle
+\endgroup
+
+\begin{abstract}
+Let $p$ and $q$ be two distinct primes and $p\le q$. This paper distills the conditions that both primes must satisfy in order for the elliptic curve $y^2=x^3-pqx$ to have rational solutions. Based on these conditions we demonstrate that any elliptic curve of this form has a rational solution.
+\end{abstract}
+
+\newpage
+\section{Introduction}
+\label{introduction}
+TBD
+
+\section{\texorpdfstring{Conditions for the curve $y^2=x^3-pqx$ to have a rational solution}{Conditions for the curve y2=x3-pqx to have a rational solution}}
+\label{conditions}
+
+We intersect a linear function $y=\nicefrac{a}{b}\cdot x$ that has a rational slope ($a,b\in\mathbb{N}$) with the elliptic curve $y^2=x^3-pqx$. In order to retrieve the intersection points we must solve the following equation~\ref{eq:solve_rational_points}:
+
+\begin{equation}
+\label{eq:solve_rational_points}
+0=x^3-\left(\frac{a}{b}\right)^2x^2-pqx
+\end{equation}
+
+One intersection point trivially is $(x,y)=(0,0)$. The two remaining intersection points we retrieve by the quadratic formula~\ref{eq:quadratic_formula}:
+
+\begin{equation}
+\label{eq:quadratic_formula}
+x=\frac{1}{2}\left(\frac{a}{b}\right)^2\pm\sqrt{\frac{\left(\frac{a}{b}\right)^4+4pq}{4}}
+\end{equation}
+
+We can slightly convert the discriminant (the term under the square root) such that one can recognize at a glimpse the condition to be met for obtaining a rational solution:
+
+\begin{equation}
+\label{eq:discriminant}
+\Delta=\frac{a^4+4pqb^4}{4b^4}
+\end{equation}
+
+In order to obtain a rational solution, the sum $a^4+4pqb^4=c^2$ must be a square number. We get $4pqb^4=c^2-a^4=(c-a^2)(c+a^2)$. Now there exist several cases to be considered, how the factors $2\cdot2\cdot p\cdot q\cdot b\cdot b\cdot b\cdot b$ are assigned to the two factors $(c-a^2)$ and $(c+a^2)$.
+
+One case is $c-a^2=2pq$ and $c+a^2=2b^4$ which after substracting both equations from each other leads to $2pq=2b^4-2a^2$ providing the condition that $pq=b^4-a^2$ must be a difference of a fourth power and square number. This case is shown by the first row in Table~\ref{table:cases}. Let us retrace this principle by an example $p=3$ and $q=5$. In this case $3\cdot5=2^4-1^2=b^4-a^2$ and thus $c=31$ and the discriminant $\Delta=\nicefrac{961}{64}$ which finally leads to the rational solutions $(x,y)=(4,2)$ and $(x,y)=(\nicefrac{-15}{4},\nicefrac{-15}{8})$.
+
+\newpage
+{\renewcommand{\arraystretch}{1.8}
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\thead[l]{$\boldsymbol{c-a^2}$} &
+\thead[l]{$\boldsymbol{c+a^2}$} &
+\thead[l]{\textbf{Condition}} &
+\thead[l]{\textbf{Example Curve}} &
+\thead[l]{\textbf{Rational Points}}
+\\
+\hline
+$2pq$ &
+$2b^4$ &
+$pq=b^4-a^2$ &
+$y^2=x^3-15x$ &
+$(4,2),(\nicefrac{-15}{4},\nicefrac{-15}{8})$
+\\
+\hline
+$2b^2$ &
+$2pqb^2$ &
+$pq-1=\left(\frac{a}{b}\right)^2$ &
+tbd &
+tbd
+\\
+\hline
+$2pqb$ &
+$2b^3$ &
+$pq=\frac{b^3-a^2}{b}$ &
+$y^2=x^3-21x$ &
+$(7,14),(-3,-6)$
+\\
+\hline
+\end{tabular}
+\label{table:cases}
+\end{table}}
+
+\vspace{1em}
+\bibliographystyle{unsrt}
+\bibliography{main}
+\end{document}

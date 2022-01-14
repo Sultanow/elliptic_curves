@@ -1,5 +1,6 @@
+from numba.cuda import target
 import numpy as np
-from numba import jit
+from numba import jit, cuda
 import gmpy2
 from gmpy2 import mpz, xmpz
 
@@ -23,9 +24,11 @@ def findIntegerSolutionsGmpy2(limit: np.uint64):
             print([x,gmpy2.sqrt(y),y])
 
 def main() -> int:
+    print(cuda.gpus)
+
     limit = 1000000000
     start = time.time()
-    findIntegerSolutionsGmpy2(limit)
+    findIntegerSolutions(limit)
     end = time.time()
     print("Time elapsed: {0}".format(end - start))
     return 0

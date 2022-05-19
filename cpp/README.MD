@@ -1,5 +1,5 @@
 ## Arty's programm to search integer solutions of an elliptic curve
-With the greatful help of [Arty](https://chat.stackoverflow.com/users/941531/arty) we could demonstrate how `C++` beats the performance and precision of other approaches involving Python along with JIT, CUDA.
+With the greatful help of [Arty](https://chat.stackoverflow.com/users/941531/arty) we could demonstrate how `C++` beats the performance and precision of other approaches involving `Python` along with `JIT`, `CUDA`.
 
 On Linux do the following:
 

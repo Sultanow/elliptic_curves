@@ -24,6 +24,26 @@ def find_integer_solutions_gmpy2(limit: np.uint64):
         if gmpy2.is_square(y):
             print([x,gmpy2.sqrt(y),y])
 
+def find_integer_solutions_gmpy2_for_mp(begin, end, *, cache = {}):
+    def call(begin, end):
+        for x in range(begin, end):
+            x = mpz(int(x))
+            y = mpz(x**6-4*x**2+4)
+            if gmpy2.is_square(y):
+                print([x,gmpy2.sqrt(y),y])
+    if 'compiled' not in cache:
+        cache['compiled'] = jit('void(uint64, uint64)', forceobj = True)(call)
+    cache['compiled'](begin, end)
+
+def find_integer_solutions_gmpy2_multiprocessing(limit: np.uint64):
+    import multiprocessing as mp
+    limit = int(limit)
+    nthreads = mp.cpu_count()
+    print(f'Using {nthreads} cores.')
+    block = max(1, (limit + 1 + nthreads * 8 - 1) // (nthreads * 8))
+    with mp.Pool(nthreads) as pool:
+        pool.starmap(find_integer_solutions_gmpy2_for_mp, [(i, min(i + block, limit + 1)) for i in range(0, limit + 1, block)])
+
 #dauert 5min
 @jit('void(uint64)', forceobj = True)
 def find_integer_solutions_gmpy2_optimized(limit: np.uint64):
@@ -34,11 +54,11 @@ def find_integer_solutions_gmpy2_optimized(limit: np.uint64):
             print([x,gmpy2.sqrt(y),y])
 
 def main() -> int:
-    print(cuda.gpus)
+    #print(cuda.gpus)
 
-    limit = 1000000000
+    limit = 10_000_000
     start = time.time()
-    find_integer_solutions_gmpy2_optimized(limit)
+    find_integer_solutions_gmpy2_multiprocessing(limit)
     end = time.time()
     print("Time elapsed: {0}".format(end - start))
     return 0

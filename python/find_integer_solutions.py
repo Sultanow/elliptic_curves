@@ -56,7 +56,7 @@ def find_integer_solutions_gmpy2_optimized(limit: np.uint64):
 def main() -> int:
     #print(cuda.gpus)
 
-    limit = 10_000_000
+    limit = 100_000_000
     start = time.time()
     find_integer_solutions_gmpy2_multiprocessing(limit)
     end = time.time()

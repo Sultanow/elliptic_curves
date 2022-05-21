@@ -35,6 +35,7 @@ def find_integer_solutions_gmpy2_for_mp(begin, end, *, cache = {}):
         cache['compiled'] = jit('void(uint64, uint64)', forceobj = True)(call)
     cache['compiled'](begin, end)
 
+#enormer speedup ohne Präzisionsverlust
 def find_integer_solutions_gmpy2_multiprocessing(limit: np.uint64):
     import multiprocessing as mp
     limit = int(limit)
@@ -43,6 +44,16 @@ def find_integer_solutions_gmpy2_multiprocessing(limit: np.uint64):
     block = max(1, (limit + 1 + nthreads * 8 - 1) // (nthreads * 8))
     with mp.Pool(nthreads) as pool:
         pool.starmap(find_integer_solutions_gmpy2_for_mp, [(i, min(i + block, limit + 1)) for i in range(0, limit + 1, block)])
+
+@njit('void(uint64)', cache = True, parallel = True)
+def find_integer_solutions_numpy_parallel(limit: np.uint64):
+    x = np.arange(0, limit + 1).astype(np.int64)
+    y = x ** 6 - 4 * x ** 2 + 4
+    root = (np.sqrt(y) + 0.5).astype(np.int64)
+    idxs = np.flatnonzero(root * root == y)
+    for i in idxs:
+        print([x[i], root[i], y[i]])
+        assert int(root[i]) ** 2 == int(y[i])
 
 #dauert 5min
 @jit('void(uint64)', forceobj = True)

@@ -35,3 +35,22 @@ g++ -std=c++20 -O3 -m64 /c/Users/esultano/git/elliptic_curves/cpp/prog.cpp -o /c
 ```console
 /c/Users/esultano/git/elliptic_curves/cpp/prog 0 100000000
 ```
+
+## Arty's programm for congruent numbers
+
+```console
+apt install sudo
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+sudo apt update
+sudo apt upgrade
+sudo apt install gcc
+sudo apt install g++-11
+sudo apt install libc6
+sudo apt upgrade libstdc++6
+```
+
+```console
+g++-11 -std=c++20 -O3 -m64 congruent_numbers.cpp -o congruent_numbers -lpthread
+```

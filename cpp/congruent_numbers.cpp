@@ -525,13 +525,13 @@ void Main() {
         tasks.push_back(std::async(std::launch::async, [&gmux, &done_pq, &fsols, &fsols_buf, &fsols_flush_time, gstart_time, p, q, iPQ, iA, iB, iX]{
             auto const res = Task<i64>(p * q, block * iA, block * (iA + 1), block * iB, block * (iB + 1),
                 block * block * iX, block * block * (iX + 1));
-            std::ostringstream ss;
+            std::ostringstream cplx_log2, ss;
+            cplx_log2 << "2^" << std::fixed << std::setprecision(2) << std::setw(5) << std::log2(std::max<size_t>(1, res.complexity));
             ss  << std::fixed << std::setw(6) << std::llround(Time() - gstart_time) << " sec <" << std::setw(3) << iPQ << ": p = "
                 << std::setw(3) << p << ", q = " << std::setw(3) << q
                 << ">[" << std::setw(4) << iA << ", " << std::setw(4) << iB << ", " << std::setw(5) << iX << "]: time " << std::fixed
                 << std::setprecision(3) << std::setw(7) << res.rtime << " sec, complexity " << std::setw(7)
-                << (std::ostringstream{} << "2^" << std::fixed << std::setprecision(2) << std::setw(5) << std::log2(std::max<size_t>(1, res.complexity))).str()
-                << ", xA_coprime_r " << std::setprecision(3) << std::setw(5) << res.xA_coprime_ratio << ", [";
+                << cplx_log2.str() << ", xA_coprime_r " << std::setprecision(3) << std::setw(5) << res.xA_coprime_ratio << ", [";
             for (auto const [x, A, y, B]: res.xy)
                 ss << "(x = " << x << "/" << A << ", y = " << y << "/" << B << "), ";
             ss << "]";

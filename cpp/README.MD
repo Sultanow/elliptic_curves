@@ -38,6 +38,8 @@ g++ -std=c++20 -O3 -m64 /c/Users/esultano/git/elliptic_curves/cpp/prog.cpp -o /c
 
 ## Arty's programm for congruent numbers
 
+Install prerequisites:
+
 ```console
 apt install sudo
 sudo apt update
@@ -51,6 +53,14 @@ sudo apt install libc6
 sudo apt upgrade libstdc++6
 ```
 
+Compile program:
+
 ```console
 g++-11 -std=c++20 -O3 -m64 congruent_numbers.cpp -o congruent_numbers -lpthread
+```
+
+Run program:
+
+```console
+./congruent_numbers
 ```

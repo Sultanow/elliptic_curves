@@ -69,7 +69,7 @@ sudo clang++-15 -std=c++20 -O3 -m64 congruent_numbers.cpp -o congruent_numbers -
 ```
 or
 ```console
-/usr/bin/g++-11 -std=c++20 -O3 -m64 congruent_numbers.cpp -o congruent_numbers -lpthread -lstdc++
+sudo /usr/bin/g++-11 -std=c++20 -O3 -m64 congruent_numbers.cpp -o congruent_numbers -lpthread -lstdc++
 ```
 
 Run program:

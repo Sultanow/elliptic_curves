@@ -49,18 +49,31 @@ sudo apt update
 sudo apt upgrade
 sudo apt install gcc
 sudo apt install g++-11
+sudo apt install libgmp3-dev
 sudo apt install libc6
 sudo apt upgrade libstdc++6
+```
+
+Install Clang 15:
+
+```console
+sudo apt-key adv --keyserver keyserver.ubuntu.com:80 --recv-keys A4B469963BF863CC
+sudo apt install lsb-release wget software-properties-common
+sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
 ```
 
 Compile program:
 
 ```console
-g++-11 -std=c++20 -O3 -m64 congruent_numbers.cpp -o congruent_numbers -lpthread
+sudo clang++-15 -std=c++20 -O3 -m64 congruent_numbers.cpp -o congruent_numbers -lpthread -lstdc++
+```
+or
+```console
+sudo /usr/bin/g++-11 -std=c++20 -O3 -m64 congruent_numbers.cpp -o congruent_numbers -lpthread -lstdc++
 ```
 
 Run program:
 
 ```console
-./congruent_numbers
+sudo ./congruent_numbers
 ```

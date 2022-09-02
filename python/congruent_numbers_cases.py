@@ -1,7 +1,8 @@
 # https://www.overleaf.com/read/prsvxqtdwthm
 import multiprocessing as mp, traceback, math
 
-lim = 200
+limA = 1000
+limB = 60
 
 def PQs():
     import sympy
@@ -18,7 +19,7 @@ def PQs():
             continue
         yield (fs[0], fs[1])
 
-def Task(ipq, *, ab = [(a, b) for a in range(-lim + 1, lim) for b in range(1, lim) if a != 0 and math.gcd(a, b) == 1]):
+def Task(ipq, *, ab = [(a, b) for a in range(-limA + 1, limA) for b in range(1, limB) if a != 0 and math.gcd(a, b) == 1]):
     try:
         i, (p, q) = ipq
         cases = {}
@@ -41,11 +42,20 @@ def Task(ipq, *, ab = [(a, b) for a in range(-lim + 1, lim) for b in range(1, li
 
 def Main():
     with mp.Pool(mp.cpu_count()) as pool:
+        k, kc, avgA, avgB, maxA, maxB = 0, 0, 0, 0, 0, 0
         for e in pool.imap(Task, enumerate(PQs())):
             if type(e) is dict:
                 assert False, e['error']
             (i, p, q), cases = e
-            print(f'{i:>3}: {p:>3}, {q:>3}', '   ', cases if cases else '')
+            for _, v in cases.items():
+                for a, b in v:
+                    maxA = max(abs(a), maxA)
+                    maxB = max(b, maxB)
+                    avgA += abs(a)
+                    avgB += b
+                    k += abs(a) / b
+                    kc += 1
+            print(f'{i:>5}: {p:>5}, {q:>5}', '   ', *((cases, '     avg(a/b)', round(k / max(1, kc), 1), 'maxA', maxA, 'avgA', round(avgA / kc, 1), 'maxB', maxB, 'avgB', round(avgB / kc, 1)) if cases else ()))
 
 if __name__ == '__main__':
     Main()

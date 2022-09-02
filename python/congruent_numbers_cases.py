@@ -45,9 +45,7 @@ def Main():
             if type(e) is dict:
                 assert False, e['error']
             (i, p, q), cases = e
-            print(f'{i:>3}: {p:>3}, {q:>3}')
-            if cases:
-                print(cases)
+            print(f'{i:>3}: {p:>3}, {q:>3}', '   ', cases if cases else '')
 
 if __name__ == '__main__':
     Main()

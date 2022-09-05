@@ -23,7 +23,7 @@
 #define ASSERT_MSG(cond, msg) { if (!(cond)) { throw std::runtime_error("Assertion (" #cond ") failed at line " + std::to_string(__LINE__) + "! Msg '" + std::string(msg) + "'"); } }
 #define ASSERT(cond) ASSERT_MSG(cond, "")
 #define TRY(code) [&]{ try { return (code); } catch (std::exception const & ex) { throw std::runtime_error("Nested exception for code '" #code "' at line " + std::to_string(__LINE__) + ", inner exception:\n" + std::string(ex.what())); } }()
-#define LN //{ COUT(<< "LN " << __LINE__ << std::endl << std::flush); }
+#define LN { COUT(<< "LN " << __LINE__ << std::endl << std::flush); }
 #define COUT(code) if (1) { auto lock = glog.Locker(); lock.Stream() code; }
 #define bit_sizeof(x) (sizeof(x) * 8)
 
@@ -467,7 +467,7 @@ void Main() {
     COUT(<< "============  Program Start  ============" << std::endl);
     
     size_t constexpr block = 1 << 7;
-    double const blocks_per_pq = 0.02;
+    double const blocks_per_pq = 0.000002;
     size_t const nthr = NThreads();
     auto const gstart_time = Time();
     auto const & pqs = PQs();

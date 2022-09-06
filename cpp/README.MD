@@ -77,3 +77,18 @@ Run program:
 ```console
 sudo ./congruent_numbers
 ```
+
+## Compiling and running under Windows
+Start MSYS2 MinGW Clang x64
+
+Compile program:
+
+```console
+g++ -std=c++20 -O3 -m64 /c/Users/esultano/git/elliptic_curves/cpp/congruent_numbers.cpp -o /c/Users/esultano/git/elliptic_curves/cpp/congruent_numbers -lpthread -lstdc++ -lm
+```
+
+Run program:
+
+```console
+/c/Users/esultano/git/elliptic_curves/cpp/congruent_numbers.exe
+```

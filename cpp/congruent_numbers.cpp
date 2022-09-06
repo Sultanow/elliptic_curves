@@ -467,7 +467,7 @@ void Main() {
     COUT(<< "============  Program Start  ============" << std::endl);
     
     size_t constexpr block = 1 << 7;
-    double const blocks_per_pq = 0.000002;
+    double const blocks_per_pq = 0.00000002;
     size_t const nthr = NThreads();
     auto const gstart_time = Time();
     auto const & pqs = PQs();

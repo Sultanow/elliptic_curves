@@ -78,6 +78,21 @@ Run program:
 sudo ./congruent_numbers
 ```
 
+Obtain a status:
+
+```console
+tail -c 2000000 ec_pq_find_rational_xy.log | grep "Total PQs"
+```
+
+The command above yields for example:
+
+```console
+--------------- Total PQs 40065 (last 5,45263), Solved 6963 (17.4%), Worst 3,11 (1 blocks) ---------------
+--------------- Total PQs 40066 (last 227,997), Solved 6963 (17.4%), Worst 3,11 (1 blocks) ---------------
+--------------- Total PQs 40067 (last 17,13313), Solved 6963 (17.4%), Worst 3,11 (1 blocks) ---------------
+--------------- Total PQs 40068 (last 89,2543), Solved 6963 (17.4%), Worst 3,11 (1 blocks) ---------------
+```
+
 ***Note:*** Compile and run the program `congruent_numbers_ab.cpp` analoguosly to `congruent_numbers.cpp`.
 
 ## Compiling and running under Windows

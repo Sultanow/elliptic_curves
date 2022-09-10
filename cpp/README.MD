@@ -78,6 +78,8 @@ Run program:
 sudo ./congruent_numbers
 ```
 
+***Note:*** Compile and run the program `congruent_numbers_ab.cpp` analoguosly to `congruent_numbers.cpp`.
+
 ## Compiling and running under Windows
 Start MSYS2 MinGW Clang x64
 

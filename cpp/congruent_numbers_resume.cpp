@@ -19,6 +19,7 @@
 #include <future>
 #include <thread>
 #include <sstream>
+#include <fstream>
 #include <regex>
 
 #define ASSERT_MSG(cond, msg) { if (!(cond)) { throw std::runtime_error("Assertion (" #cond ") failed at line " + std::to_string(__LINE__) + "! Msg '" + std::string(msg) + "'"); } }

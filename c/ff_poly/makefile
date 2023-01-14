@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -O3 -fomit-frame-pointer -funroll-loops -m64 -pedantic -std=gnu99
 LDFLAGS = -static
-INCLUDES = -I/usr/local/include -I/mingw64/include -I/mingw64/x86_64-w64-mingw32/include
-LIBS = -lgmp -lm
+INCLUDES = -I/usr/include
+LIBS = -lgmp -lm 
 INSTALL_ROOT = ~/bin/ff_poly
 
 HEADERS = asm.h ff.h ffmontgomery64.h ff2k.h ffext.h ffpolyfromroots.h ffpolybig.h ffpolysmall.h ffpoly.h cstd.h ntutil.h polyparse.h

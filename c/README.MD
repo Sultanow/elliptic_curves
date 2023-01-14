@@ -12,3 +12,9 @@ end_time = time(0);
 fclose (context.fp);
 smalljac_curve_clear(curve);
 ```
+
+## Install dependencies under MSYS64
+
+```bash
+pacman -S gmp
+```

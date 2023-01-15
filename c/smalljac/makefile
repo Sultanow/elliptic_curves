@@ -1,11 +1,9 @@
 CC = gcc
 CFLAGS = -O3 -fomit-frame-pointer -funroll-loops -m64 -pedantic -std=gnu99
 LDFLAGS = -static
-INCLUDES = -I/usr/include -I/home/esultano/bin/ff_poly/include
-#LIBS = -lff_poly -lgmp -lm
-# put -lgmp last (see https://stackoverflow.com/questions/29046724/undefined-reference-to-imp-gmpz-init-building-gmp-program-on-cygwin)
-LIBS = -L/home/esultano/bin/ff_poly/lib -lff_poly -L/mingw64/lib -lgmp -lm 
-INSTALL_ROOT = ~/bin/smalljac
+INCLUDES = -I/usr/include -I/data/ellipticcurverank/bin/ff_poly/include
+LIBS = -L/data/ellipticcurverank/bin/ff_poly/lib -lff_poly -lgmp -lm
+INSTALL_ROOT = /data/ellipticcurverank/bin/smalljac
 
 HEADERS = ecurve.h ecurve_ff2.h g2tor3poly.h hecurve.h hcpoly.h igusa.h jac.h jacorder.h lpplot.h nfpoly.h pointcount.h smalljac_g23.h smalljac_internal.h smalljactab.h bitmap.h cstd.h mpzpolyutil.h mpzutil.h ntutil.h polyparse.h prime.h
 OBJECTS = ecurve.o ecurve_ladic.o ecurve_ff2.o hcpoly.o hecurve.o hecurve1.o hecurve2_ladic.o hecurve2.o igusa.o jac.o jacorder.o jacstructure.o nfpoly.o pointcount.o \

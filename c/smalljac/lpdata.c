@@ -25,30 +25,42 @@ struct callback_ctx {
 	FILE *fp;
 };
 
+
+float sum = 0;
 /*
-	This callback function simply outputs L_p(T) coefficients a_1,...a_g to ctx->fp and computes a1_sum.
+           This callback function simply outputs L_p(T) coefficients a_1,...a_g to ctx->fp and computes a1_sum.
 */
 int dump_lpoly (smalljac_curve_t curve, unsigned long p, int good, long a[], int n, void *arg)
 {
-	static int cnt;
-	struct callback_ctx *ctx;
-
-	ctx = (struct callback_ctx*) arg;
-	ctx->count++;
-
-	if ( ! n ) {
-		printf ("Lpoly not computed at %ld\n", p); ctx->missing_count++; fprintf (ctx->fp, "%ld,?\n", p); 
-		return 1;
-	}
-	ctx->trace_sum -= a[0];
-	switch (n) {
-	case 1: fprintf(ctx->fp,"%ld,%ld\n", p, a[0]); break;
-	case 2: fprintf(ctx->fp,"%ld,%ld,%ld\n", p, a[0], a[1]); break;
-	case 3: fprintf(ctx->fp,"%ld,%ld,%ld,%ld\n", p, a[0], a[1], a[2]); break;
-	default: printf ("\rUnexpected number of Lpoly coefficients %d\n", n);  return 0;
-	}
-	if ( ! ((++cnt)&0xFFFF) ) printf ("\r%lu\r", p);  fflush(stdout);
-	return 1;	
+        static int cnt;
+        struct callback_ctx *ctx;
+        ctx = (struct callback_ctx*) arg;
+        ctx->count++;
+           
+        if ( ! n ) {
+          printf ("Lpoly not computed at %ld\n", p); ctx->missing_count++; fprintf (ctx->fp, "%ld,?\n", p);
+          return 1;
+         }
+        ctx->trace_sum -= a[0];
+        
+        switch (n) {
+           case 1:
+                sum += a[0]*log(p)/p;
+                //printf("%f",sum);
+                break;
+           case 2:
+                fprintf(ctx->fp,"%ld,%ld,%ld\n", p, a[0], a[1]);
+                break;
+           case 3:
+                fprintf(ctx->fp,"%ld,%ld,%ld,%ld\n", p, a[0], a[1], a[2]);
+                break;
+           default:
+                printf ("\rUnexpected number of Lpoly coefficients %d\n", n);
+                return 0;
+           }
+    
+           if ( ! ((++cnt)&0xFFFF) ) printf ("\r%lu\r", p);  fflush(stdout);
+           return 1;
 }
 
 
@@ -136,6 +148,10 @@ int main (int argc, char *argv[])
 	// this is where everything happens...
 	start_time = time(0);
 	result = smalljac_parallel_Lpolys (curve, minp, maxp, flags, dump_lpoly, (void*)&context);
+    
+    sum = sum / maxp + 0.5;
+    printf ("Mestre's sum is %lf\n", sum);
+    
 //	result = smalljac_Lpolys (curve, minp, maxp, flags, dump_lpoly, (void*)&context);
 	end_time = time(0);
 	

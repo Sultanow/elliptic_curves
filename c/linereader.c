@@ -1,42 +1,20 @@
-#include <stdio.h>
-#include <string.h>
-
-#define LINE_SIZE 1000
-
-int main() {
-    // Open the text file
-    FILE *fp = fopen("file.txt", "r");
-    if (fp == NULL) {
-        printf("Error opening file\n");
-        return 1;
-    }
-
-    // Read the file line by line
-    char line[LINE_SIZE];
-    while (fgets(line, LINE_SIZE, fp) != NULL) {
-        // Find the start and end indices of the inner square brackets
-        int start = -1, end = -1;
-        for (int i = 0; i < strlen(line); i++) {
-            if (line[i] == '[') {
-                start = i;
-            }
-            else if (line[i] == ']') {
-                end = i;
-                break;
-            }
-        }
-        if (start != -1 && end != -1) {
+ if (start != -1 && end != -1) {
             // Copy the substring between the square brackets into a new buffer
             int substring_size = end - start + 1;
             char substring[substring_size];
+            memcpy(sub
+
+planetskillz7@gmail.com
+the end of the code didnt finish outputting
+
+I apologize for the incomplete response, here is the rest of the code to make a system call and echo the value of the substring using "echo substring":
+
             memcpy(substring, line + start, substring_size);
             substring[substring_size] = '\0';
-            printf("%s\n", substring);
+            // Create the command string
+            char command[LINE_SIZE];
+            snprintf(command, LINE_SIZE, "echo %s", substring);
+            // Make the system call
+            system(command);
         }
     }
-
-    // Close the file
-    fclose(fp);
-
-    return 0;
-}

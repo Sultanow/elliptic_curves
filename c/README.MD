@@ -1,4 +1,4 @@
-## A program that calculates the rank of an elliptic curve
+# A program that calculates the rank of an elliptic curve
 Using [Sutherland's library smalljac](https://math.mit.edu/~drew/) we implement a `C` program that calculates the rank of elliptic curves in a parallel manner.
 
 For example we call `result = smalljac_parallel_Lpolys(curve, minp, maxp, flags, dum)` where `curve=[0,1,1,-347,48061]` and `minp=1` and `maxp=100` and (by default) `flags=0` (possible values are SMALLJAC_GOOD_ONLY, SMALLJAC_A1_ONLY, SMALLJAC_DEGREE1_ONLY).

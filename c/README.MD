@@ -25,4 +25,4 @@ In order to run the program call
 ./lpdata testf "[1,1,0,-15413,728554]" 100000
 ```
 
-which yields writes output to testf_lpdata.txt and yields *"Output written to file testf_lpdata.txt"*.
+which writes an output file testf_lpdata.txt and yields *"Output written to file testf_lpdata.txt"*.

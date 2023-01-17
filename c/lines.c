@@ -13,11 +13,13 @@ int main() {
     char string_example[1000];
     while (fscanf(file, "[ %*d, %d, %d, %d, %d, %d, %*d ]\n", &data[0], &data[1], &data[2], &data[3], &data[4]) == 5) {
     
-      sprintf(string_example, "%d %d %d %d %d", data[0], data[1], data[2], data[3], data[4]);
-          char command[1000];
-                       snprintf(command, 1000, "echo %s", string_example);
-                       // Make the system call
-                       system(command);
+     sprintf(string_example, "%d, %d, %d, %d, %d", data[0], data[1], data[2], data[3], data[4]);
+    
+     char command[1000];
+     snprintf(command, 1000, "./lpdata0 test [%s] 2e17", string_example);
+     printf("%s\n",command);
+      // Make the system call
+     system(command);
        
     }
 

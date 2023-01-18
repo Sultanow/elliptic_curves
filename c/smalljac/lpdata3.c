@@ -28,7 +28,8 @@ struct callback_ctx {
 
 // global variable
 
-float sum = 0;
+float sum3 = 0;
+float sum0 = 0;
 /*
 	This callback function simply outputs L_p(T) coefficients a_1,...a_g to ctx->fp and computes a1_sum.
 */
@@ -47,7 +48,9 @@ int dump_lpoly (smalljac_curve_t curve, unsigned long p, int good, long a[], int
 	}
 	ctx->trace_sum -= a[0];
 	switch (n) {
-	case 1: sum += ((a[0]+2)*log(p)/(p+1+a[0]));break;
+	case 1: sum3 += ((a[0]+2)*log(p)/(p+1+a[0]));
+			sum0 += a[0]*log(p)/p;
+			break;
 	case 2: fprintf(ctx->fp,"%ld,%ld,%ld\n", p, a[0], a[1]); break;
 	case 3: fprintf(ctx->fp,"%ld,%ld,%ld,%ld\n", p, a[0], a[1], a[2]); break;
 	default: printf ("\rUnexpected number of Lpoly coefficients %d\n", n);  return 0;
@@ -74,52 +77,66 @@ int main (int argc, char *argv[])
 	        printf("Error opening file!\n");
 	        exit(1);
 	    }
+
+	    //open the new file to write the modified contents
+	    FILE *new_file = fopen("candidates_modified.txt", "w");
+	        if (new_file == NULL) {
+	            printf("Error creating new file!\n");
+	            exit(1);
+	        }
+	    
 	
 	    int data[5];
-	    char curve[1000];
+	    char curvename[1000];
 	    while (fscanf(file, "[ %*d, %d, %d, %d, %d, %d, %*d ]\n", &data[0], &data[1], &data[2], &data[3], &data[4]) == 5) {
 	    
-	     sprintf(curve, "[%d, %d, %d, %d, %d]", data[0], data[1], data[2], data[3], data[4]);
+	     sprintf(curvename, "[%d, %d, %d, %d, %d]", data[0], data[1], data[2], data[3], data[4]);
 	    flags = 0;
 	    jobs = jobid = 0;
 	    minp=1;
-	    maxp=100000;
-	    curve = smalljac_curve_init (curve, &err);
+	    maxp=131072;
+	    curve = smalljac_curve_init (curvename, &err);
 
 		memset (&context,0,sizeof(context));
-
-	    if ( jobs ) sprintf (filename, "%testfile_lpdata_%d_%d.txt", jobs, jobid); else sprintf (filename, "%testfile_lpdata.txt");
-	    	context.fp = fopen (filename,"w");
-	    if ( ! context.fp ) { printf ("Error creating file %s\n", filename); return 0; }
+		
+	 //   if ( jobs ) sprintf (filename, "%testfile_lpdata_%d_%d.txt", jobs, jobid); else sprintf (filename, "%testfile_lpdata.txt");
+	  // 	context.fp = fopen (filename,"w");
+	//    if ( ! context.fp ) { printf ("Error creating file %s\n", filename); return 0; }
 	    	
 	    	// write header line
 	    
 	    	fflush (context.fp);		// important to flush before calling parallel Lpolys!!
-	    	
+			fflush(new_file);	    	
 	    	context.trace_sum = 0;
 	    
 	    	// this is where everything happens...
-	    	start_time = time(0);
 	    	result = smalljac_parallel_Lpolys (curve, minp, maxp, flags, dump_lpoly, (void*)&context);
-	    	sum = sum/log(maxp);
-	    	printf("%f",sum);
-	    //	result = smalljac_Lpolys (curve, minp, maxp, flags, dump_lpoly, (void*)&context);
-	    	end_time = time(0);
+	    	sum3 = sum3/log(maxp);
+	    	sum0 = sum0/log(maxp) + 0.5;
+
+	    	 // concatenate the contents of the line with a certain string
+      	  char modified_line[1024];
+       	 sprintf(modified_line,"%s,%f,%f\n", curvename, sum0,sum3);
+        // write the concatenated string to the new file
+      	  printf( "%s", modified_line);
+	      
+
+
+	   	
+		
+	    	// write the concatenated string to the new file
+	  	 //	fprintf(new_file, "%s\n", modified_line);
 	    	
-	    	fclose (context.fp);
+
+
+	    //	fclose (context.fp);
 	    	smalljac_curve_clear (curve);
-	    	
-	    	if ( result < 0 ) {  printf ("smalljac_Lpolys returned error %ld\n", result);  return 0; }
-	    	printf ("trace sum is %ld\n", context.trace_sum);
-	    	if ( context.missing_count ) printf ("%ld Lpolys not computed due to bad reduction\n", context.missing_count);
-	    	printf ("Processed %ld primes in %ld seconds (%.3f ms/prime)\n", context.count,
-	    		   end_time-start_time, (context.count? ((1000.0*(end_time-start_time))/context.count) : 0.0));
-	    	printf ("Output written to file %s\n", filename);
-	    
+
 	       
 	    }
 	
 	    fclose(file);
-	
+		fclose(new_file);
 	
 }
+

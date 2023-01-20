@@ -6,6 +6,8 @@ For example we call `result = smalljac_parallel_Lpolys(curve, minp, maxp, flags,
 ## Prerequisites
 In order to get the program running, the library [GMP](https://gmplib.org/) (The GNU Multiple Precision Arithmetic Library) must be installed. Additionally [Sutherland's library ff_poly](https://math.mit.edu/~drew/) is required.
 
+In order to check the path of a required lib, for instance *gmp*, run the command `ld -lgmp --verbose`.
+
 ## Installation under Linux
 Suppose `/data/ellipticcurverank` is the directory, into which we want to install our program.
 

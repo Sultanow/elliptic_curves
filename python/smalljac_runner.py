@@ -1,6 +1,7 @@
 import subprocess
 import sys
 import csv
+import timeit
 
 def main() -> int:
     #curvesfile = 'C:/Users/esultano/git/elliptic_curves/data/candidates_small.txt'
@@ -8,6 +9,7 @@ def main() -> int:
     numcurves = sum(1 for _ in open(curvesfile))
     result = [None]*numcurves
 
+    start = timeit.default_timer()
     with open(curvesfile) as f:
         for i, line in enumerate(f.readlines()):
             line = line.strip()
@@ -28,7 +30,10 @@ def main() -> int:
             
             #result.insert(i, curve+sums)
             result[i] = curve+sums
-
+    end = timeit.default_timer()
+    elapsed_time = round((t_1 - t_0) / 60, 3)
+    print(f"Elapsed time: {elapsed_time} mins")
+    
     with open(curvesfile + '.result.csv', 'w+', newline='') as result_csv:
         csvWriter = csv.writer(result_csv, delimiter=',')
         csvWriter.writerows(result)

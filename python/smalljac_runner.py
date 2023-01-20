@@ -3,7 +3,8 @@ import sys
 import csv
 
 def main() -> int:
-    curvesfile = 'C:/Users/esultano/git/elliptic_curves/data/candidates_small.txt'
+    #curvesfile = 'C:/Users/esultano/git/elliptic_curves/data/candidates_small.txt'
+    curvesfile = './candidates_small.txt'
     numcurves = sum(1 for _ in open(curvesfile))
     result = [None]*numcurves
 
@@ -11,15 +12,20 @@ def main() -> int:
         for i, line in enumerate(f.readlines()):
             line = line.strip()
             curve = eval(line)
+            del curve[0]
+            del curve[-1]
             # call external process (smalljac) to obtain the sums and append them to the line
-            # result = subprocess.run(
-            #    [sys.executable, "-c", "C:/Users/esultano/git/elliptic_curves/python/smalljac_emulator.bat"], capture_output=True, text=True
-            #)
-            #sums = result.stdout
-            cmd1 = [r'C:/Users/esultano/git/elliptic_curves/python/smalljac_emulator.bat']
-            p = subprocess.Popen(cmd1,stdin=subprocess.PIPE,stdout=subprocess.PIPE)
-            output = p.communicate(input='x'.encode())[0]
-            sums = eval(output.decode('ascii').strip())
+            cmd_line = "./smalljac/lpdata " + "testfile " + '"' + str(curve) + '"' + " 2e17"
+            processoutput = subprocess.run(
+                cmd_line, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
+            )           
+            sums = eval(processoutput.stdout)
+            
+            # cmd1 = [r'C:/Users/esultano/git/elliptic_curves/python/smalljac_emulator.bat']
+            # p = subprocess.Popen(cmd1,stdin=subprocess.PIPE,stdout=subprocess.PIPE)
+            # output = p.communicate(input='x'.encode())[0]
+            # sums = eval(output.decode('ascii').strip())
+            
             #result.insert(i, curve+sums)
             result[i] = curve+sums
 

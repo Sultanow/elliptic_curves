@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "/zfs/users/ahatzi/ahatzi/ff_poly_v1.2.7/ff_poly.h"
+#include "ff_poly.h"
 #include "mpzutil.h"
 #include "smalljac.h"
 #include "cstd.h"
@@ -56,7 +56,7 @@ int dump_lpoly (smalljac_curve_t curve, unsigned long p, int good, long a[], int
 	case 3: fprintf(ctx->fp,"%ld,%ld,%ld,%ld\n", p, a[0], a[1], a[2]); break;
 	default: printf ("\rUnexpected number of Lpoly coefficients %d\n", n);  return 0;
 	}
-	if ( ! ((++cnt)&0xFFFF) ) printf ("\r%lu\r", p);  fflush(stdout);
+	//if ( ! ((++cnt)&0xFFFF) ) printf ("\r%lu\r", p);  fflush(stdout);
 	return 1;	
 }
 
@@ -113,19 +113,19 @@ int main (int argc, char *argv[])
 		minp = 1; maxp = atol_exp(argv[3]);
 	}
 	curve = smalljac_curve_init (argv[2], &err);
-	if ( ! curve ) { 
-		switch (err) {
-		case SMALLJAC_PARSE_ERROR: printf ("Unable to parse curve string: %s\n", argv[2]); break;
-		case SMALLJAC_UNSUPPORTED_CURVE: puts ("Specified curve not supported - should be degree 3, 5, or 7\n");  break;
-		case SMALLJAC_SINGULAR_CURVE: puts ("Specified curve is singular\n");  break;
-		default: printf ("smalljac_curve_init returned error %d\n", err);
-		}
-		return 0;
-	}
-	if ( smalljac_curve_nf_degree(curve) > 2 ) {
-		printf ("Only computing L-poly coefficients at degree-1 primes over number field of degree %d\n", smalljac_curve_nf_degree(curve));
-		flags |= SMALLJAC_DEGREE1_ONLY;
-	}
+	//if ( ! curve ) { 
+	//	switch (err) {
+	//	case SMALLJAC_PARSE_ERROR: printf ("Unable to parse curve string: %s\n", argv[2]); break;
+	//	case SMALLJAC_UNSUPPORTED_CURVE: puts ("Specified curve not supported - should be degree 3, 5, or 7\n");  break;
+	//	case SMALLJAC_SINGULAR_CURVE: puts ("Specified curve is singular\n");  break;
+	//	default: printf ("smalljac_curve_init returned error %d\n", err);
+	//	}
+	//	return 0;
+	//}
+	//if ( smalljac_curve_nf_degree(curve) > 2 ) {
+	//	printf ("Only computing L-poly coefficients at degree-1 primes over number field of degree %d\n", smalljac_curve_nf_degree(curve));
+	//	flags |= SMALLJAC_DEGREE1_ONLY;
+	//}
 
 	memset (&context,0,sizeof(context));
 	
@@ -145,7 +145,7 @@ int main (int argc, char *argv[])
 	// this is where everything happens...
 	// start_time = time(0);
 	result = smalljac_parallel_Lpolys (curve, minp, maxp, flags, dump_lpoly, (void*)&context);
-//	result = smalljac_Lpolys (curve, minp, maxp, flags, dump_lpoly, (void*)&context);
+	// result = smalljac_Lpolys (curve, minp, maxp, flags, dump_lpoly, (void*)&context);
 	// end_time = time(0);
 	sum3 = sum3/log(maxp);
 	sum0 = sum0/log(maxp) + 0.5;

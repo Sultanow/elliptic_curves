@@ -1,201 +1,163 @@
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
-#include <sys/wait.h>
 #include <string.h>
-#include <errno.h>
-#include "cstd.h"
+#include <time.h>
+#include "/zfs/users/ahatzi/ahatzi/ff_poly_v1.2.7/ff_poly.h"
+#include "mpzutil.h"
 #include "smalljac.h"
-#include "ff_poly.h"
+#include "cstd.h"
 
 /*
-    Copyright (c) 2012 Pavel Panchekha and Andrew V. Sutherland
+    Copyright (c) 2011-2012 Andrew V. Sutherland
     See LICENSE file for license details.
 */
 
-#define MAX_THREADS	256	// Maximum number of threads.  Actual number will be set based on # cores available.
-int smalljac_parallel_threads ()
+// Program to demonstrate basic use of the smalljac interface -- dumps Lpoly coefficient data to a file
+
+
+#define delta_msecs(s,t)		(1000UL*(t-s)/CLOCKS_PER_SEC)
+
+// Context structure for callback function - this is user defined, modify to suit
+struct callback_ctx {
+	unsigned long count;
+	unsigned long missing_count;
+	long trace_sum;
+	FILE *fp;
+};
+
+// global variable
+
+float sum0=0;
+float sum3=0;
+
+/*
+	This callback function simply outputs L_p(T) coefficients a_1,...a_g to ctx->fp and computes a1_sum.
+*/
+int dump_lpoly (smalljac_curve_t curve, unsigned long p, int good, long a[], int n, void *arg)
 {
-	int k, threads;
+	static int cnt;
+	struct callback_ctx *ctx;
+
+	ctx = (struct callback_ctx*) arg;
+	ctx->count++;
+
 	
-	threads = sysconf(_SC_NPROCESSORS_ONLN);
-	if ( threads <= 0 ) {
-		printf ("Couldn't determine online processor count, assuming just one.\n");
-		threads = 1;
-	} else if ( threads > MAX_THREADS ) {
-		threads = MAX_THREADS;
+	if ( ! n ) {
+		printf ("Lpoly not computed at %ld\n", p); ctx->missing_count++; fprintf (ctx->fp, "%ld,?\n", p); 
+		return 1;
 	}
-
-	k = ui_len(threads) - 1;
-	threads = 1 << k; // round down to nearest power of 2
-	return threads;
-}
-
-int smalljac_parallel_callback (smalljac_curve_t curve, unsigned long p, int good, long a[], int n, void *arg)
-{
-	FILE *out = (FILE *) arg;
-	fwrite(&p, sizeof(p), 1, out);
-	fwrite(&good, sizeof(good), 1, out);
-	fwrite(&n, sizeof(n), 1, out);
-	if ( n ) fwrite(&(a[0]), sizeof(a[0]), n, out);
-	return 1;
-}
-
-int smalljac_parallel_argmin(unsigned long *p, int n) {
-	unsigned long min_val, min_arg;
-	int i;
-	min_val = (0 - 1);
-	min_arg = -1;
-	for ( i = 0 ; i < n ; i++ ) {
-		if (p[i] < min_val) {
-			min_val = p[i];
-			min_arg = i;
-		}
+	ctx->trace_sum -= a[0];
+	switch (n) {
+	case 1: sum3 += ((a[0]+2)*log(p)/(p+1+a[0]));
+				sum0 += a[0]*log(p)/p;
+				 break;
+	case 2: fprintf(ctx->fp,"%ld,%ld,%ld\n", p, a[0], a[1]); break;
+	case 3: fprintf(ctx->fp,"%ld,%ld,%ld,%ld\n", p, a[0], a[1], a[2]); break;
+	default: printf ("\rUnexpected number of Lpoly coefficients %d\n", n);  return 0;
 	}
-	return min_arg;
+	if ( ! ((++cnt)&0xFFFF) ) printf ("\r%lu\r", p);  fflush(stdout);
+	return 1;	
 }
 
-long smalljac_parallel_Lpolys (smalljac_curve_t curve, unsigned long start, unsigned long end, unsigned long flags, int (*callback)(smalljac_curve_t, unsigned long, int, long[], int, void *), void *arg)
+
+int main (int argc, char *argv[])
 {
-	int child_rpipe[MAX_THREADS][2], child_wpipe[MAX_THREADS][2];
-	FILE *in[MAX_THREADS], *out[MAX_THREADS];
-	pid_t child_pid[MAX_THREADS];
-	int threads, child;
+	time_t start_time, end_time;
+	smalljac_curve_t curve;
+	char filename[256];
+	struct callback_ctx context;
+	unsigned long flags;
 	long result;
-	int i,status;
-
-	unsigned long stream_heads[MAX_THREADS];
-	// The p are sent in order, so we only need to remember the
-	// filtration status of the last prime
-	unsigned long p, last_filter; 							  
-	int good, n;
-	long a[2*SMALLJAC_MAX_GENUS];	// Modified 12/1/12 by AVS to use fixed array for a -- n should never exceed 2*MAX_GENUS
-
+	int i, err, jobs, jobid;
+	long minp, maxp;
+	char *s,*t;
 	
-	last_filter = 0; // Start with everything unfiltered
-
-	threads = smalljac_parallel_threads();
-
-	if ( 1 == threads || end - start < 25 ) { // 25 was experimentally determined
-		// Fast-path a one-thread case
-		return smalljac_Lpolys(curve, start, end, flags, callback, arg);
-	}
-
-	flags |= (threads - 1) << (SMALLJAC_SPLIT_SHIFT + 1);
-
-	fflush(0);	// clear i/o buffers before we fork anything
-	
-	// we only need threads children, because the parent will be aggregating
-	child = 0;
-	for ( i = 0 ; i < threads ; i++ ) {
-		if  ( pipe (child_rpipe[i]) == -1 || pipe(child_wpipe[i]) == -1 ) {
-			printf ("Error creating pipe: %d\n", errno);
-			exit(1);
-		}
-
-		child_pid[i] = fork();
-		if ( child_pid[i] ) {  // in parent
-			close(child_rpipe[i][0]);
-			out[i] = fdopen (child_rpipe[i][1], "w");
-			in[i] = fdopen (child_wpipe[i][0], "r");
-			close(child_wpipe[i][1]);
-		} else {  // in child
-			in[i] = fdopen (child_rpipe[i][0], "r");
-			close (child_rpipe[i][1]);
-			close (child_wpipe[i][0]);
-			out[i] = fdopen (child_wpipe[i][1], "w");
-			flags |= i << (SMALLJAC_HIGH_SHIFT + 1);
-			child = 1;
-			break; // Only parent creates child processes
-		}
-	}
-
-	if (child) {
-		result = smalljac_Lpolys (curve, start, end, flags, smalljac_parallel_callback, out[i]);
-		p = -1;
-		fwrite(&p, sizeof(p), 1, out[i]);
-		fclose (out[i]);
-		fclose (in[i]);
-		if ( result < 0 ) {
-			printf ("smalljac_Lpolys returned error %ld\n", result);
-			exit(-result);
-		}
-		exit(0);
-	} else {
-		// Fill out heads
-		for ( i = 0 ; i < threads ; i++ ) {
-			result = fread(&(stream_heads[i]), sizeof(stream_heads[i]), 1, in[i]);
-			if (!result) { printf("Unexpected EOF (init, %d)\n", i); goto die; }
-		}
-
-		for (;;) {
-			// Determine least prime; could be faster, but not worth it
-			i = smalljac_parallel_argmin(stream_heads, threads);
-
-			// All heads are empty (value -1)
-			if (i == -1) { p = end; goto early_exit; }
-
-			// Read in data for prime
-			p = stream_heads[i];
-			result = fread(&good, sizeof(good), 1, in[i]);
-			if (!result) { printf("Unexpected EOF ($good, %d)\n", i); goto die; }
-			result = fread(&n, sizeof(n), 1, in[i]);
-			if (!result) { printf("Unexpected EOF ($n, %d)\n", i); goto die; }
-			if ( n < 0 || n > 2*SMALLJAC_MAX_GENUS ) { printf("Read unexpected value n=%d from stream %d\n", n, i); goto die; }
-
-			if (n) {			
-				result = fread(&(a[0]), sizeof(a[0]), n, in[i]);
-				if (result < n) { printf("Unexpected EOF ($a[%ld], %d)\n", result, i); goto die; }
-			}
-
-			// Send to user
-			if ( p != last_filter ) { // Don't call callback for filtered p
-				result = callback(curve, p, good, a, n, arg);
-			}
-
-			if ( !result ) {
-				if (good >= 0) {
-					goto early_exit;
-				} else { // Filtration
-					last_filter = p;
-				}
-			} else {
-				last_filter = 0;
-			}
-
-			// Update stream head
-			result = fread(&(stream_heads[i]), sizeof(stream_heads[i]), 1, in[i]);
-			if (!result) { printf("Unexpected EOF ($p, %d)\n", i); goto die; }
-		}
-
+	if ( argc < 4 ) {
+		printf ("Usage:    lpdata file-prefix curve-spec interval/bound [flags jobs job-id]\n\n");
+		printf ("Examples:\n");
+		printf ("          lpdata mycurve \"x^5 + 3145926x + 271828\" [1000..2000] 1\n");
+		printf ("          lpdata 31a \"[1,-1-a,a,0,0] / (a^2-a-1)\" 10e6\n");
+		printf ("          lpdata foo \"[x^3 + (z^3+z-1)*x + 3*z^2-4] / (z^4+z^3+z^2+z+1)\" 2e20 4\n");
+		puts ("");
+		printf ("flags&1 => SMALLJAC_GOOD_ONLY, flags&2 => SMALLJAC_A1_ONLY, flags&4 => SMALLJAC_DEGREE1.\n");
+		printf ("smalljac version %s\n", SMALLJAC_VERSION_STRING);
 		return 0;
 	}
-
-	printf("Should never happen, line %d, file %s\n", __LINE__, __FILE__);
-	exit(1);
-
- early_exit:
- 	result = (long)p;
-	for ( i = 0 ; i < threads ; i++ ) {
-		fclose(in[i]);
-		fclose(out[i]);
-		waitpid(child_pid[i],&status,0);
-		if (!WIFEXITED(status)) {
-			printf("Unexpected result from waitpid()\n");
-			exit(1);
+	
+	flags = 0;
+	jobs = jobid = 0;
+	if ( argc > 4 ) {
+		i = atol (argv[4]);
+		if ( i < 0 || i > 7 ) { printf ("Unknown/unsupported flags specified\n"); return 0; }
+		if ( i&1 ) flags |= SMALLJAC_GOOD_ONLY;
+		if ( i&2 ) flags |= SMALLJAC_A1_ONLY;
+		if ( i&4 ) flags |= SMALLJAC_DEGREE1_ONLY;
+	}
+	if ( argc > 5 ) {
+		jobs = atoi (argv[5]);
+		for ( i = 1 ; i <9 ;i++ ) if ( jobs == (1<<i) ) break;
+		if ( i == 9 ) { printf ("When specified, jobs must be 2^k with 1 <= k <= 8\n"); return 0; }
+		if ( argc < 7 ) { puts ("Please specify job-id also\n"); return 0; }
+		flags |= ((1UL<<i)-1) << (SMALLJAC_SPLIT_SHIFT+1);
+		jobid = (atoi(argv[6]) % jobs);
+		flags |= jobid << (SMALLJAC_HIGH_SHIFT+1);
+	}
+	
+	if ( (t = strstr(argv[3],"..")) ) {
+		*t = '\0';
+		s = argv[3]; if ( *s == '[' ) s++;
+		minp = atol_exp(s);
+		maxp = atol_exp(t+2);
+	} else {
+		minp = 1; maxp = atol_exp(argv[3]);
+	}
+	curve = smalljac_curve_init (argv[2], &err);
+	if ( ! curve ) { 
+		switch (err) {
+		case SMALLJAC_PARSE_ERROR: printf ("Unable to parse curve string: %s\n", argv[2]); break;
+		case SMALLJAC_UNSUPPORTED_CURVE: puts ("Specified curve not supported - should be degree 3, 5, or 7\n");  break;
+		case SMALLJAC_SINGULAR_CURVE: puts ("Specified curve is singular\n");  break;
+		default: printf ("smalljac_curve_init returned error %d\n", err);
 		}
-		if (WEXITSTATUS(status))
-			result = -(long)WEXITSTATUS(status);
+		return 0;
 	}
-	return result;
+	if ( smalljac_curve_nf_degree(curve) > 2 ) {
+		printf ("Only computing L-poly coefficients at degree-1 primes over number field of degree %d\n", smalljac_curve_nf_degree(curve));
+		flags |= SMALLJAC_DEGREE1_ONLY;
+	}
 
- die:
-#if 0
-	for ( i = 0 ; i < threads ; i++ ) {
-		fclose(in[i]);
-		fclose(out[i]);
-	}
-	return SMALLJAC_NODATA;
-#else
-	exit(1);
-#endif
+	memset (&context,0,sizeof(context));
+	
+	// if ( jobs ) sprintf (filename, "%s_lpdata_%d_%d.txt", argv[1], jobs, jobid); else sprintf (filename, "%s_lpdata.txt", argv[1]);
+	// context.fp = fopen (filename,"w");
+	// if ( ! context.fp ) { printf ("Error creating file %s\n", filename); return 0; }
+	
+	// write header line
+	// if ( argv[2][0] != '[' ) fprintf (context.fp, "[%s]", argv[2]); else fprintf (context.fp,"%s",argv[2]);
+	// fprintf (context.fp, " %ld %ld", minp, maxp);
+	// if ( jobs ) fprintf(context.fp, " %d %d", jobs, jobid);
+	// fprintf (context.fp, "\n");
+	fflush (context.fp);		// important to flush before calling parallel Lpolys!!
+	
+	context.trace_sum = 0;
+
+	// this is where everything happens...
+	// start_time = time(0);
+	result = smalljac_parallel_Lpolys (curve, minp, maxp, flags, dump_lpoly, (void*)&context);
+//	result = smalljac_Lpolys (curve, minp, maxp, flags, dump_lpoly, (void*)&context);
+	// end_time = time(0);
+	sum3 = sum3/log(maxp);
+	sum0 = sum0/log(maxp) + 0.5;
+	printf("[%f,%f]\n",sum0,sum3);
+	
+	// fclose (context.fp);
+	smalljac_curve_clear (curve);
+	
+	// if ( result < 0 ) {  printf ("smalljac_Lpolys returned error %ld\n", result);  return 0; }
+	// printf ("trace sum is %ld\n", context.trace_sum);
+	// if ( context.missing_count ) printf ("%ld Lpolys not computed due to bad reduction\n", context.missing_count);
+	// printf ("Processed %ld primes in %ld seconds (%.3f ms/prime)\n", context.count,
+		   // end_time-start_time, (context.count? ((1000.0*(end_time-start_time))/context.count) : 0.0));
+	// printf ("Output written to file %s\n", filename);
 }

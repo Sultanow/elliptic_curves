@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "/zfs/users/ahatzi/ahatzi/ff_poly_v1.2.7/ff_poly.h"
+#include "ff_poly.h"
 #include "mpzutil.h"
 #include "smalljac.h"
 #include "cstd.h"

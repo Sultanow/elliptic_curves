@@ -16,6 +16,22 @@ mkdir /data/ellipticcurverank/bin /data/ellipticcurverank/bin/ff_poly /data/elli
 mkdir /data/ellipticcurverank/bin /data/ellipticcurverank/bin/smalljac /data/ellipticcurverank/bin/smalljac/lib /data/ellipticcurverank/bin/smalljac/include
 ```
 
+The folder structure looks as follows, where *ff_poly* and *smalljac* are the original folders containing the sources and where the folders of the same name inside the bin directory contain the compilations that are created (and copied thereto) by the corresponding build process.
+
+```bash
+├── ellipticcurverank
+│   ├── bin
+│   │   ├── ff_poly
+│   │   │   ├── include
+│   │   │   │   └── ff_poly
+│   │   │   └── lib
+│   │   └── smalljac
+│   │       ├── include
+│   │       └── lib
+│   ├── ff_poly
+│   └── smalljac
+```
+
 To compile the program go into the directory */data/ellipticcurverank/ff_poly* and run `make install all`. After that go into the directory */data/ellipticcurverank/smalljac* and run again `make install all`.
 
 ## Running the program

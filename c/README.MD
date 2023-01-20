@@ -32,7 +32,35 @@ The folder structure looks as follows, where *ff_poly* and *smalljac* are the or
 │   └── smalljac
 ```
 
-To compile the program go into the directory */data/ellipticcurverank/ff_poly* and run `make install all`. After that go into the directory */data/ellipticcurverank/smalljac* and run again `make install all`.
+To compile the program go into the directory */data/ellipticcurverank/ff_poly* and run `make install all`. After that go into the directory */data/ellipticcurverank/smalljac* and run again `make install all`. After the *ff_poly* build process the header file *ff_poly.h* is located in *bin/ff_poly/include*:
+
+```bash
+├── ellipticcurverank
+│   ├── bin
+│   │   ├── ff_poly
+│   │   │   ├── include
+│   │   │   │   ├── ff_poly
+│   │   │   │   │   ├── asm.h
+│   │   │   │   │   ├── cstd.h
+│   │   │   │   │   ├── ff.h
+│   │   │   │   │   ├── ff2k.h
+│   │   │   │   │   ├── ffext.h
+│   │   │   │   │   ├── ffmontgomery64.h
+│   │   │   │   │   ├── ffpoly.h
+│   │   │   │   │   ├── ffpolybig.h
+│   │   │   │   │   ├── ffpolyfromroots.h
+│   │   │   │   │   ├── ffpolysmall.h
+│   │   │   │   │   ├── ntutil.h
+│   │   │   │   │   └── polyparse.h
+│   │   │   │   └── ff_poly.h
+│   │   │   └── lib
+│   │   │       └── libff_poly.a
+│   │   └── smalljac
+│   │       ├── include
+│   │       │   └── smalljac.h
+│   │       └── lib
+│   │           └── libsmalljac.a
+```
 
 ## Running the program
 In order to run the program call

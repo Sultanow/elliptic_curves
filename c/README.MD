@@ -79,3 +79,9 @@ In order to run the program call
 ```
 
 which writes an output file testf_lpdata.txt and yields *"Output written to file testf_lpdata.txt"*.
+
+To let *lpdata* process a file line by line, for instance the file *candidates.txt* (see *data* folder in this repository), then call the Python script *smalljac_runner.py* (see *python* folder in this repository) as follows:
+
+```bash
+python smalljac_runner.py > out.txt
+```

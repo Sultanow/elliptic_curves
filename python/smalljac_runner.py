@@ -5,11 +5,11 @@ import timeit
 
 def main() -> int:
     #curvesfile = 'C:/Users/esultano/git/elliptic_curves/data/candidates_small.txt'
-    curvesfile = './candidates_small.txt'
+    curvesfile = './candidates.txt'
     numcurves = sum(1 for _ in open(curvesfile))
     result = [None]*numcurves
 
-    start = timeit.default_timer()
+    starttime = timeit.default_timer()
     with open(curvesfile) as f:
         for i, line in enumerate(f.readlines()):
             line = line.strip()
@@ -30,8 +30,8 @@ def main() -> int:
             
             #result.insert(i, curve+sums)
             result[i] = curve+sums
-    end = timeit.default_timer()
-    elapsed_time = round((t_1 - t_0) / 60, 3)
+    endtime = timeit.default_timer()
+    elapsed_time = round((endtime - starttime) / 60, 3)
     print(f"Elapsed time: {elapsed_time} mins")
     
     with open(curvesfile + '.result.csv', 'w+', newline='') as result_csv:

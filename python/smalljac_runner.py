@@ -33,7 +33,7 @@ def main() -> int:
     elapsed_time = round((endtime - starttime) / 60, 3)
     print(f"Elapsed time: {elapsed_time} mins")
     
-    result = result[0:j+1]
+    result = result[0:j]
 
     with open(curvesfile + '.result.csv', 'w+', newline='') as result_csv:
         csvWriter = csv.writer(result_csv, delimiter=',')

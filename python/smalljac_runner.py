@@ -8,24 +8,23 @@ def main() -> int:
     curvesfile = './candidates.txt'
     numcurves = sum(1 for _ in open(curvesfile))
     result = [None]*numcurves
-
+    j = 0
     starttime = timeit.default_timer()
     with open(curvesfile) as f:
         # we parse lines looking like this: [999999999847,[1,1,1,-8578,-313130],-1]
-        j = 0
         for i, line in enumerate(f.readlines()):
             line = line.strip()
             curve = eval(line)
             conductor = curve[0]
             coeffs = curve[1]
             # discriminant = curve[2]
-            
+
             # call external process (smalljac) to obtain the sums and append them to the line
             cmd_line = "./smalljac/lpdata " + "testfile " + '"' + str(coeffs) + '"' + " 2e17"
             processoutput = subprocess.run(
                 cmd_line, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
             )
-            sum3 = eval(processoutput.stdout)
+            sum3 = float(processoutput.stdout[1:])
             
             if sum3 > 2.9:
                 result[j] = [conductor]+coeffs+[sum3]
@@ -34,6 +33,8 @@ def main() -> int:
     elapsed_time = round((endtime - starttime) / 60, 3)
     print(f"Elapsed time: {elapsed_time} mins")
     
+    result = result[0:j+1]
+
     with open(curvesfile + '.result.csv', 'w+', newline='') as result_csv:
         csvWriter = csv.writer(result_csv, delimiter=',')
         csvWriter.writerows(result)

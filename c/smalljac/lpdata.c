@@ -27,8 +27,6 @@ struct callback_ctx {
 };
 
 // global variable
-
-float sum0=0;
 float sum3=0;
 
 /*
@@ -36,22 +34,12 @@ float sum3=0;
 */
 int dump_lpoly (smalljac_curve_t curve, unsigned long p, int good, long a[], int n, void *arg)
 {
-	static int cnt;
 	struct callback_ctx *ctx;
 
 	ctx = (struct callback_ctx*) arg;
 	ctx->count++;
-
-	
-	if ( ! n ) {
-		printf ("Lpoly not computed at %ld\n", p); ctx->missing_count++; fprintf (ctx->fp, "%ld,?\n", p); 
-		return 1;
-	}
-	ctx->trace_sum -= a[0];
 	switch (n) {
-	case 1: sum3 += ((a[0]+2)*log(p)/(p+1+a[0]));
-				sum0 += a[0]*log(p)/p;
-				 break;
+	case 1: sum3 += ((a[0]+2)*log(p)/(p+1+a[0])); break;
 	case 2: fprintf(ctx->fp,"%ld,%ld,%ld\n", p, a[0], a[1]); break;
 	case 3: fprintf(ctx->fp,"%ld,%ld,%ld,%ld\n", p, a[0], a[1], a[2]); break;
 	default: printf ("\rUnexpected number of Lpoly coefficients %d\n", n);  return 0;
@@ -148,8 +136,7 @@ int main (int argc, char *argv[])
 	// result = smalljac_Lpolys (curve, minp, maxp, flags, dump_lpoly, (void*)&context);
 	// end_time = time(0);
 	sum3 = sum3/log(maxp);
-	sum0 = sum0/log(maxp) + 0.5;
-	printf("[%f,%f]\n",sum0,sum3);
+	printf("%f\n", sum3);
 	
 	// fclose (context.fp);
 	smalljac_curve_clear (curve);

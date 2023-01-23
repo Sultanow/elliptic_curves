@@ -11,25 +11,25 @@ def main() -> int:
 
     starttime = timeit.default_timer()
     with open(curvesfile) as f:
+        # we parse lines looking like this: [999999999847,[1,1,1,-8578,-313130],-1]
+        j = 0
         for i, line in enumerate(f.readlines()):
             line = line.strip()
             curve = eval(line)
-            del curve[0]
-            del curve[-1]
+            conductor = curve[0]
+            coeffs = curve[1]
+            # discriminant = curve[2]
+            
             # call external process (smalljac) to obtain the sums and append them to the line
-            cmd_line = "./smalljac/lpdata " + "testfile " + '"' + str(curve) + '"' + " 2e17"
+            cmd_line = "./smalljac/lpdata " + "testfile " + '"' + str(coeffs) + '"' + " 2e17"
             processoutput = subprocess.run(
                 cmd_line, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
-            )           
-            sums = eval(processoutput.stdout)
+            )
+            sum3 = eval(processoutput.stdout)
             
-            # cmd1 = [r'C:/Users/esultano/git/elliptic_curves/python/smalljac_emulator.bat']
-            # p = subprocess.Popen(cmd1,stdin=subprocess.PIPE,stdout=subprocess.PIPE)
-            # output = p.communicate(input='x'.encode())[0]
-            # sums = eval(output.decode('ascii').strip())
-            
-            #result.insert(i, curve+sums)
-            result[i] = curve+sums
+            if sum3 > 2.9:
+                result[j] = [conductor]+coeffs+[sum3]
+                j+=1
     endtime = timeit.default_timer()
     elapsed_time = round((endtime - starttime) / 60, 3)
     print(f"Elapsed time: {elapsed_time} mins")

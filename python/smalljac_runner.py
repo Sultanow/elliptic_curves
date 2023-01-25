@@ -1,11 +1,10 @@
+from multiprocessing import Pool
 import subprocess
 import sys
 import csv
 import timeit
 
-def main() -> int:
-    #curvesfile = 'C:/Users/esultano/git/elliptic_curves/data/candidates_small.txt'
-    curvesfile = './candidates.txt'
+def runtask(curvesfile: str) -> str:
     numcurves = sum(1 for _ in open(curvesfile))
     result = [None]*numcurves
     j = 0
@@ -35,10 +34,34 @@ def main() -> int:
     
     result = result[0:j]
 
-    with open(curvesfile + '.result.csv', 'w+', newline='') as result_csv:
+    resultfile = curvesfile + '.result.csv'
+    with open(resultfile, 'w+', newline='') as result_csv:
         csvWriter = csv.writer(result_csv, delimiter=',')
-        csvWriter.writerows(result)
-        return 0
+        csvWriter.writerows(result)    
+    return resultfile
+
+def main() -> int:
+    #curvesfile = 'C:/Users/esultano/git/elliptic_curves/data/candidates_small.txt'
+    
+    curvesfiles = [
+        './small_100.txt', 
+        './small_101.txt', 
+        './small_102.txt', 
+        './small_103.txt', 
+        './small_104.txt',
+        './small_105.txt', 
+        './small_106.txt', 
+        './small_107.txt', 
+        './small_108.txt', 
+        './small_109.txt'
+    ]
+
+    numer_of_processes = 5
+
+    with Pool(numer_of_processes) as p:
+        results = p.map(runtask, curvesfiles)
+    print(results)
+    
 
 if __name__ == '__main__':
     sys.exit(main())

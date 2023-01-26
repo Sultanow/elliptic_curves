@@ -23,7 +23,7 @@ def runtask(curvesfile: str) -> str:
             processoutput = subprocess.run(
                 cmd_line, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
             )
-            sum3 = float(processoutput.stdout[1:])
+            sum3 = float(processoutput.stdout)
             
             if sum3 > 2.9:
                 result[j] = [conductor]+coeffs+[sum3]
@@ -32,13 +32,13 @@ def runtask(curvesfile: str) -> str:
     elapsed_time = round((endtime - starttime) / 60, 3)
     print(f"Elapsed time: {elapsed_time} mins")
     
-    result = result[0:j]
-
-    resultfile = curvesfile + '.result.csv'
-    with open(resultfile, 'w+', newline='') as result_csv:
-        csvWriter = csv.writer(result_csv, delimiter=',')
-        csvWriter.writerows(result)    
-    return resultfile
+    if j > 0:
+        result = result[0:j]
+        resultfile = curvesfile + '.result.csv'
+        with open(resultfile, 'w+', newline='') as result_csv:
+            csvWriter = csv.writer(result_csv, delimiter=',')
+            csvWriter.writerows(result)    
+        return resultfile
 
 def main() -> int:
     #curvesfile = 'C:/Users/esultano/git/elliptic_curves/data/candidates_small.txt'

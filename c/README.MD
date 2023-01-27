@@ -71,6 +71,17 @@ The result of compiling *smalljac* are the files *smalljac.h* and *libsmalljac.a
                 └── libsmalljac.a
 ```
 
+## Preparing the files
+Suppose you have 10 files: prime_all_01990, prime_all_01991, prime_all_01992, prime_all_01993, prime_all_01994, prime_all_01995, prime_all_01996, prime_all_01997, prime_all_01998, prime_all_01999.
+
+Concatenate them using the command `cat prime_all_* > prime_all_01990-01999` to one large file named prime_all_01990-01999. Then split this large file into 40 parts using the command `split -n l/40 -d -a 2 prime_all_01990-01999 subfile-`.
+
+Run the `smalljac_runner.py` program as described in the section below using the command `python smalljac_runner.py > out.txt`.
+
+In the next step concatenate all generated CSV files using the command `cat subfile-*.result.csv > prime_all_01990-01999.csv`.
+
+Finally cleanup the subfiles using the command `rm -f subfile-*`.
+
 ## Running the program
 In order to run the program call
 

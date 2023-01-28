@@ -43,9 +43,8 @@ def runtask(curvesfile: str) -> str:
 def main() -> int:
     #curvesfile = 'C:/Users/esultano/git/elliptic_curves/data/candidates_small.txt'
     
-    curvesfiles = ["./subfile-"+str(i).zfill(2) for i in range(40)]
-
-    numer_of_processes = 40
+    numer_of_processes = 36
+    curvesfiles = ["./subfile-"+str(i).zfill(2) for i in range(numer_of_processes)]
 
     with Pool(numer_of_processes) as p:
         results = p.map(runtask, curvesfiles)

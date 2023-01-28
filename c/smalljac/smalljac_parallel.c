@@ -12,7 +12,7 @@
     See LICENSE file for license details.
 */
 
-#define MAX_THREADS	256	// Maximum number of threads.  Actual number will be set based on # cores available.
+#define MAX_THREADS	1	// Maximum number of threads.  Actual number will be set based on # cores available.
 int smalljac_parallel_threads ()
 {
 	int k, threads;

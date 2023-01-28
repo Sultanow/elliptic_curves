@@ -15,7 +15,7 @@ Then download/checkout the folders *ff_poly* and *smalljac* into */data/elliptic
 
 ```bash
 mkdir /data/ellipticcurverank/bin /data/ellipticcurverank/bin/ff_poly /data/ellipticcurverank/bin/ff_poly/lib /data/ellipticcurverank/bin/ff_poly/include
-mkdir /data/ellipticcurverank/bin /data/ellipticcurverank/bin/smalljac /data/ellipticcurverank/bin/smalljac/lib /data/ellipticcurverank/bin/smalljac/include
+mkdir /data/ellipticcurverank/bin/smalljac /data/ellipticcurverank/bin/smalljac/lib /data/ellipticcurverank/bin/smalljac/include
 ```
 
 The folder structure looks as follows, where *ff_poly* and *smalljac* are the original folders containing the sources and where the folders of the same name inside the bin directory contain the compilations that are created (and copied thereto) by the corresponding build process.

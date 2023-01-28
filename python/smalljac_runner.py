@@ -23,7 +23,12 @@ def runtask(curvesfile: str) -> str:
             processoutput = subprocess.run(
                 cmd_line, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
             )
-            sum3 = float(processoutput.stdout)
+            retval = processoutput.stdout
+            sum3 = 0
+            try:
+                sum3 = float(retval)
+            except Exception as ex:
+                print("skipping " + line + " (sum3 was " + retval +")")
             
             if sum3 > 2.9:
                 result[j] = [conductor]+coeffs+[sum3]

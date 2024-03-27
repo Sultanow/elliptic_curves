@@ -10,7 +10,6 @@ import pandas as pd
 matrix_size = 500
 matrix = np.zeros((matrix_size, matrix_size), dtype = np.float64)
 
-#with open('C:/Users/esultano/git/elliptic_curves/data/elliptic_curves.csv') as f:
 with open('../../data/elliptic_curves.csv') as f:
     max_possible_cnt = 23
     max_actual_cnt = 0
@@ -31,7 +30,6 @@ with open('../../data/elliptic_curves.csv') as f:
                 max_actual_cnt = max(max_actual_cnt, cnt)
                 return 0.4 + 0.6 * Transform((cnt - 0.5) / max_possible_cnt)
             matrix[idx_p,idx_q] = GetGrey()
-            matrix[idx_q,idx_p] = matrix[idx_p,idx_q]
 
 assert max_actual_cnt == max_possible_cnt, (max_actual_cnt, max_possible_cnt)
 
@@ -53,11 +51,14 @@ fig = plt.figure(figsize=(8, 8))
 
 
 ax = fig.add_subplot(111)
-matrix_plot = ax.matshow(matrix, interpolation='nearest',
+matrix_plot = ax.imshow(matrix.transpose(), origin='lower', interpolation='nearest', 
     cmap = colors.LinearSegmentedColormap.from_list('my_cmap', matrix_cell_colors))
 #fig.colorbar(matrix_plot)
 ax.set_xticks(ticks); ax.set_xticklabels(ticklabels)
 ax.set_yticks(ticks); ax.set_yticklabels(ticklabels)
+
+ax.set_xlabel('p')
+ax.set_ylabel('q')
 
 plt.savefig('pattern_case_17_grey.png')
 plt.show()
@@ -67,7 +68,6 @@ plt.show()
 matrix_size = 500
 matrix = np.zeros((matrix_size, matrix_size), dtype = np.float64)
 
-#with open('C:/Users/esultano/git/elliptic_curves/data/elliptic_curves.csv') as f:
 with open('../../data/elliptic_curves.csv') as f:
     max_possible_cnt = 6 #change it when an assertion error arises
     max_actual_cnt = 0
@@ -96,7 +96,6 @@ with open('../../data/elliptic_curves.csv') as f:
                 assert 1 <= max_case_cnt <= max_possible_cnt, (max_case_cnt, max_possible_cnt)
                 return 1.0 / 5 * (max_case + 0.5 + 0.5 * Transform((max_case_cnt - 0.5) / max_possible_cnt))
             matrix[idx_p,idx_q] = GetColored()
-            matrix[idx_q,idx_p] = matrix[idx_p,idx_q]
 
 assert max_actual_cnt == max_possible_cnt, (max_actual_cnt, max_possible_cnt)
 
@@ -116,11 +115,14 @@ for i, c in enumerate(base_colors):
 
 fig = plt.figure(figsize=(8, 8))
 ax = fig.add_subplot(111)
-matrix_plot = ax.matshow(matrix, interpolation='nearest',
+matrix_plot = ax.imshow(matrix.transpose(), origin='lower', interpolation='nearest', 
     cmap = colors.LinearSegmentedColormap.from_list('my_cmap', matrix_cell_colors))
 #fig.colorbar(matrix_plot)
 ax.set_xticks(ticks); ax.set_xticklabels(ticklabels)
 ax.set_yticks(ticks); ax.set_yticklabels(ticklabels)
+
+ax.set_xlabel('p')
+ax.set_ylabel('q')
 
 plt.savefig('pattern_case_17_green.png')
 plt.show()

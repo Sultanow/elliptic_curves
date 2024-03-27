@@ -11,7 +11,6 @@ matrix_size = 500
 matrix = np.zeros((matrix_size, matrix_size))
 
 pq_table = []
-#with open('C:/Users/esultano/git/elliptic_curves/data/elliptic_curves.csv') as f:
 with open('../../data/elliptic_curves.csv') as f:
     for line in f.readlines():
         line = line.strip()
@@ -23,11 +22,9 @@ with open('../../data/elliptic_curves.csv') as f:
             if idx_p < matrix_size and idx_q < matrix_size:
                 if len(cases) > 0:
                     matrix[idx_p,idx_q] = 1
-                    matrix[idx_q,idx_p] = 1
                 else:
                     pq_table.append([p,q])
                     matrix[idx_p,idx_q] = 0.2
-                    matrix[idx_q,idx_p] = 0.2
 
 pd.DataFrame(pq_table).to_csv('pq_cases_case_26_c=2.csv', header=False, index=False)
 
@@ -39,10 +36,13 @@ ticklabels = [e[1] for e in axis_labels]
 
 fig = plt.figure(figsize=(8, 8))
 ax = fig.add_subplot(111)
-matrix_plot = ax.matshow(matrix, interpolation='nearest')
+matrix_plot = ax.imshow(matrix.transpose(), origin='lower', interpolation='nearest')
 #fig.colorbar(matrix_plot)
 ax.set_xticks(ticks); ax.set_xticklabels(ticklabels)
 ax.set_yticks(ticks); ax.set_yticklabels(ticklabels)
+
+ax.set_xlabel('p')
+ax.set_ylabel('q')
 
 plt.savefig('pattern_case_26_c=2.png')
 plt.show()
@@ -55,7 +55,6 @@ plt.show()
 matrix_size = 500
 matrix = np.zeros((matrix_size, matrix_size))
 
-#with open('C:/Users/esultano/git/elliptic_curves/data/elliptic_curves.csv') as f:
 with open('../../data/elliptic_curves.csv') as f:
     for line in f.readlines():
         line = line.strip()
@@ -73,7 +72,6 @@ with open('../../data/elliptic_curves.csv') as f:
             cases_list = list(cases_set)
             val = sum(i*i for i in cases_list)
             matrix[idx_p,idx_q] = val
-            matrix[idx_q,idx_p] = val
 
 max_prime = prime(matrix_size+2)
 axis_labels = list(enumerate(sieve.primerange(3, max_prime)))
@@ -83,10 +81,13 @@ ticklabels = [e[1] for e in axis_labels]
 
 fig = plt.figure(figsize=(8, 8))
 ax = fig.add_subplot(111)
-matrix_plot = ax.matshow(matrix, interpolation='nearest')
+matrix_plot = ax.imshow(matrix.transpose(), origin='lower', interpolation='nearest')
 #fig.colorbar(matrix_plot)
 ax.set_xticks(ticks); ax.set_xticklabels(ticklabels)
 ax.set_yticks(ticks); ax.set_yticklabels(ticklabels)
+
+ax.set_xlabel('p')
+ax.set_ylabel('q')
 
 plt.savefig('pattern_case_26_c=1_c=2.png')
 plt.show()

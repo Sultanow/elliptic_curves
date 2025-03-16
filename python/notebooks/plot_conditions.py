@@ -144,3 +144,41 @@ def extract_and_plot_custom_circular_arc(matrix, x0, y0, fixed_radius, threshold
     plt.show()
 
     return [tuple(point) for point in close_points], fixed_center
+
+def extract_and_plot_custom_line(matrix, slope, intercept, threshold=3, highlight_points=True):
+    """
+    Highlights points that are closest to a given straight line of the form y = slope * x + intercept.
+
+    :param matrix: The binary matrix with points.
+    :param slope: The slope (m) of the line y = mx + c.
+    :param intercept: The intercept (c) of the line y = mx + c.
+    :param threshold: Maximum distance to consider a point as belonging to the line.
+    :param highlight_points: Boolean flag to highlight points close to the line (default: True).
+    """
+    fig, ax = plt.subplots(figsize=(10, 10))
+    ax.matshow(matrix, interpolation='nearest', cmap="Greys")
+
+    # Extract the coordinates of the set points
+    points = np.column_stack(np.where(matrix == 1))
+
+    # Compute distances of points from the line y = slope * x + intercept
+    distances = np.abs(points[:, 0] - (slope * points[:, 1] + intercept))
+
+    # Select points that are close enough to the line
+    close_points = points[distances < threshold]
+
+    # Conditionally highlight the selected points
+    if highlight_points:
+        ax.scatter(close_points[:, 1], close_points[:, 0], color="red", s=3)
+
+    # Draw the guideline line
+    x_vals = np.linspace(0, matrix.shape[1], 100)
+    y_vals = slope * x_vals + intercept
+    mask = (y_vals >= 0) & (y_vals < matrix.shape[0])
+    ax.plot(x_vals[mask], y_vals[mask], color="red", linestyle='dashed', linewidth=0.5)
+
+    # Remove axis labels
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+    plt.show()

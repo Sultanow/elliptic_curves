@@ -145,6 +145,47 @@ def extract_and_plot_custom_circular_arc(matrix, x0, y0, fixed_radius, threshold
 
     return [tuple(point) for point in close_points], fixed_center
 
+def extract_and_plot_custom_lines(matrix, p_values, b_values=[2], highlight_points=True):
+    """
+    Plots theoretical lines corresponding to q = p * b^4 and highlights nearby points.
+
+    :param matrix: The binary matrix representing prime index data.
+    :param p_values: List of prime numbers to be used in q = p * b^4.
+    :param b_values: List of b values for which lines q = p * b^4 will be drawn.
+    :param highlight_points: If True, highlights nearby matrix points in red.
+    """
+    fig, ax = plt.subplots(figsize=(10, 10))
+    ax.matshow(matrix, interpolation='nearest', cmap="Greys")
+
+    rows, cols = matrix.shape
+    x_vals = np.arange(1, cols)
+
+    # Loop through different b-values to plot multiple theoretical lines
+    colors = ["red", "blue", "green", "purple", "orange"]  # Different colors for different b values
+    for i, b in enumerate(b_values):
+        y_vals = np.array([p * (b ** 4) for p in p_values])  # Compute q-values
+        y_vals = y_vals[y_vals < rows]  # Keep values inside the matrix range
+        min_length = min(len(x_vals), len(y_vals))  # Gleiche Länge sicherstellen
+        x_vals_cut = x_vals[:min_length]
+        y_vals_cut = y_vals[:min_length]  # Auch y_vals auf gleiche Länge trimmen
+
+        # Plot the calculated lines
+        ax.plot(x_vals_cut, y_vals_cut, color=colors[i % len(colors)], linestyle="dashed", linewidth=1, label=f"$b = {b}$")
+
+        # Highlight points in the matrix that match the theoretical lines
+        if highlight_points:
+            points = np.column_stack(np.where(matrix == 1))
+            close_points = [pt for pt in points if any(abs(pt[1] - p * (b ** 4)) < 3 for p in p_values)]
+            if close_points:
+                close_points = np.array(close_points)
+                ax.scatter(close_points[:, 1], close_points[:, 0], color=colors[i % len(colors)], s=3)
+
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.legend()
+    plt.title("Extracted and Plotted Theoretical Lines")
+    plt.show()
+
 def extract_and_plot_custom_line(matrix, slope, intercept, threshold=3, highlight_points=True):
     """
     Highlights points that are closest to a given straight line of the form y = slope * x + intercept.
